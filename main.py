@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # albums_list = [album['id'] for album in vk_albums['response']['items']]
     print(f"У пользователя {len(vk_albums)} альбомов с фотографиями.")
     # Устанавливаем лимит фотографий из альбома на загрузку
-    num_fotos = input("Введите количество фото для сохранения: ")
+    num_photos = input("Введите количество фото для сохранения: ")
     # Создаём экземпляр класса для сохранения фотографий
     storage = FileOp(ya_token)
     # Перебираем альбомы и пытаемся сохранить фотографии в пределах лимита на Яндекс.Диске
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         vk_photos = my_vk.get_photos(item['id'])
         sg.one_line_progress_meter('Подождите...', i + 1, len(vk_albums), 'Скопировано альбомов')
         if 'response' in vk_photos.keys():
-            storage.save_album_toYD(item['title'],vk_photos)
+            storage.save_album_toYD(item['title'],vk_photos,num_photos)
         else:
             print(f"Ошибка - {vk_photos['error']['error_code']} {vk_photos['error']['error_msg']}")
         time.sleep(0.1)
