@@ -14,15 +14,15 @@ class VK:
        response = requests.get(url, params={**self.params, **params})
        return response.json()
 
-   def get_albums(self):
+   def get_albums(self, need_system=True):
        url = 'https://api.vk.com/method/photos.getAlbums'
-       params = {'owner_id': self.id, "need_system": 1}
+       params = {'owner_id': self.id, "need_system": need_system}
        response = requests.get(url, params={**self.params, **params})
        return response.json()
 
    def get_photos(self, album_id):
        url = 'https://api.vk.com/method/photos.get'
-       params = {'owner_id': self.id, "album_id": album_id}
+       params = {'owner_id': self.id, "album_id": album_id, "extended": 1}
        response = requests.get(url, params={**self.params, **params})
        return response.json()
 

@@ -1,4 +1,3 @@
-import os
 import requests
 
 class FileOp :
@@ -8,28 +7,35 @@ class FileOp :
         self.ya_token = ya_token
         self.ya_headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'OAuth {ya_token}'}
 
-    def save_album(self, album_name, album):
-        if not os.path.exists('VK'):
-            os.mkdir('VK')
-        if not os.path.exists('VK/' + album_name):
-            print('VK/' + album_name)
-            os.mkdir('VK/' + album_name)
-        for foto in album['response']['items']:
-            filename = str(foto['id'])
-            foto_url = list(sorted(foto['sizes'], key=lambda dict: dict['type'], reverse=True))[0]['url']
-            r=requests.get(foto_url)
-            with open('VK/' + album_name + '/' + filename + '.jpg', 'wb') as f:
-                f.write(r.content)
+    # Тестовый вариант - сохранение в файл
+    # def save_album(self, album_name, album):
+    #     if not os.path.exists('VK'):
+    #         os.mkdir('VK')
+    #     if not os.path.exists('VK/' + album_name):
+    #         print('VK/' + album_name)
+    #         os.mkdir('VK/' + album_name)
+    #     for foto in album['response']['items']:
+    #         filename = str(foto['id'])
+    #         foto_url = list(sorted(foto['sizes'], key=lambda dict: dict['type'], reverse=True))[0]['url']
+    #         r=requests.get(foto_url)
+    #         with open('VK/' + album_name + '/' + filename + '.jpg', 'wb') as f:
+    #             f.write(r.content)
 
-    def save_album_toYD(self, album_name, album):
+    def save_album_toYD(self, album_name, album, num_photos = 5):
+        # Создаём каталог на Яндекс.Диск
         requests.put(f"{self.ya_url}?path={'VK/' + album_name}", headers=self.ya_headers)
-        # print(r.status_code)
-        for foto in album['response']['items']:
-            filename = str(foto['id'])
-            foto_url = list(sorted(foto['sizes'], key=lambda dict: dict['type'], reverse=True))[0]['url']
-            source=requests.get(foto_url)
+        # Формируем список фотографий с наибольшим разрешением из нескольких представлений в ВК.
+        save_list = []
+        for photo in album['response']['items']:
+            photo_params = [str(photo['id']),str(photo['likes']['count'])]
+            sorted_list = list(sorted(photo['sizes'], key=lambda dict: dict['type'], reverse=True))
+            photo_params.append(sorted_list[0]['url'])
+            photo_params.append(sorted_list[0]['width'] * sorted_list[0]['height'])
+            save_list.append(photo_params)
+        # Обрабатываем список фотографий и сохраняем на Яндекс.Диск из альбома только num_photos с наибольшим разрешением
+        for best_photo in sorted(save_list, key=lambda rec: rec[3])[:-num_photos - 1:-1]:
+            source=requests.get(best_photo[2])
+            filename = best_photo[1] + '_' + best_photo[0]
             dest = requests.get(f"{self.ya_url + '/upload'}?path={'VK/' + album_name+ '/' + filename}&overwrite=True",
-                               headers=self.ya_headers).json()
-            print(dest)
-            res=requests.put(dest['href'], files={'file': source.content})
-
+                                headers=self.ya_headers).json()
+            requests.put(dest['href'], files={'file': source.content})
