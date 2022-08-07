@@ -2,7 +2,6 @@ from vk import VK
 from file_op import FileOp
 import json
 import time
-import pprint
 import PySimpleGUI as sg
 
 if __name__ == '__main__':
@@ -33,3 +32,4 @@ if __name__ == '__main__':
         else:
             print(f"Ошибка - {vk_photos['error']['error_code']} {vk_photos['error']['error_msg']}")
         time.sleep(0.1)
+    storage.save_json()
