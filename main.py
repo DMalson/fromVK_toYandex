@@ -3,6 +3,7 @@ from file_op import FileOp
 import json
 import time
 import pprint
+import PySimpleGUI as sg
 
 if __name__ == '__main__':
     # Вводим исходные данные
@@ -15,19 +16,19 @@ if __name__ == '__main__':
         # ya_token = input("Введите yandex-token для копирования файлов: ")
     # Подключаемся к ВК и получаем список альбомов
     my_vk = VK(access_token, user_id)
-    vk_albums = my_vk.get_albums()
+    vk_albums = my_vk.get_albums()['response']['items']
     # albums_list = [album['id'] for album in vk_albums['response']['items']]
-    print(f"У пользователя {len(vk_albums['response']['items'])} альбомов с фотографиями.")
+    print(f"У пользователя {len(vk_albums)} альбомов с фотографиями.")
     # Устанавливаем лимит фотографий из альбома на загрузку
     num_fotos = input("Введите количество фото для сохранения: ")
     # Создаём экземпляр класса для сохранения фотографий
     storage = FileOp(ya_token)
     # Перебираем альбомы и пытаемся сохранить фотографии в пределах лимита на Яндекс.Диске
-    for item in vk_albums['response']['items']:
-        print(f"ID - {item['id']}, альбом - '{item['title']}'")
+
+    for i, item in enumerate(vk_albums):
         vk_photos = my_vk.get_photos(item['id'])
+        sg.one_line_progress_meter('Подождите...', i + 1, len(vk_albums), 'Скопировано альбомов')
         if 'response' in vk_photos.keys():
-            print(f"Фотографий - {vk_photos['response']['count']}")
             storage.save_album_toYD(item['title'],vk_photos)
         else:
             print(f"Ошибка - {vk_photos['error']['error_code']} {vk_photos['error']['error_msg']}")
