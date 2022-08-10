@@ -41,7 +41,7 @@ class FileOp :
             photo_params.append(sorted_list[0]['type'])
             save_list.append(photo_params)
         # Обрабатываем список фотографий и сохраняем на Яндекс.Диск из альбома только num_photos с наибольшим разрешением
-        for best_photo in sorted(save_list, key=lambda rec: rec[3])[:-num_photos - 1:-1]:
+        for best_photo in sorted(save_list, key=lambda rec: rec[3])[:-int(num_photos) - 1:-1]:
             source=requests.get(best_photo[2])
             filename = best_photo[1] + '_' + best_photo[0] + '.jpg'
             dest = requests.get(f"{self.ya_url + '/upload'}?path={'VK/' + album_name+ '/' + filename}&overwrite=True",
