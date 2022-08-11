@@ -6,7 +6,7 @@ from progress.bar import IncrementalBar
 
 if __name__ == '__main__':
     # Вводим исходные данные
-    with open("Service/VK-service.txt", "r", encoding="utf-8") as ini_file:
+    with open("Service/Service.ini", "r", encoding="utf-8") as ini_file:
         my_ini = json.load(ini_file)
         access_token = my_ini['vk_token']
         # user_id = my_ini['vk_id']
