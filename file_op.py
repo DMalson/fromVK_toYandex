@@ -44,7 +44,9 @@ class FileOp :
         for best_photo in sorted(save_list, key=lambda rec: rec[3])[:-int(num_photos) - 1:-1]:
             source=requests.get(best_photo[2])
             filename = best_photo[1] + '_' + best_photo[0] + '.jpg'
+            print('\u00bb', end ='')
             dest = requests.get(f"{self.ya_url + '/upload'}?path={'VK/' + album_name+ '/' + filename}&overwrite=True",
                                 headers=self.ya_headers).json()
             requests.put(dest['href'], files={'file': source.content})
             self.list_of_files.append({"file_name" : filename, "size": best_photo[4]})
+        print('!')

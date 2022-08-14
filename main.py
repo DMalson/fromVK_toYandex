@@ -1,8 +1,10 @@
+import sys
+
 from vk import VK
 from file_op import FileOp
 import json
 import time
-from progress.bar import IncrementalBar
+
 
 if __name__ == '__main__':
     # Вводим исходные данные
@@ -22,15 +24,13 @@ if __name__ == '__main__':
     num_photos = input("Введите количество фото для сохранения: ")
     # Создаём экземпляр класса для сохранения фотографий
     storage = FileOp(ya_token)
-    bar = IncrementalBar('Копирование альбомов', max=len(vk_albums))
     # Перебираем альбомы и пытаемся сохранить фотографии в пределах лимита на Яндекс.Диске
     for i, item in enumerate(vk_albums):
         vk_photos = my_vk.get_photos(item['id'])
-        bar.next()
+        print(f'Обрабатываю альбом {i+1} из {len(vk_albums)} ',end='')
         if 'response' in vk_photos.keys():
             storage.save_album_toYD(item['title'],vk_photos,num_photos)
         else:
             print(f"Ошибка - {vk_photos['error']['error_code']} {vk_photos['error']['error_msg']}")
         time.sleep(0.1)
-    bar.finish()
     storage.save_json()
